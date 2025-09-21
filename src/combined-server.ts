@@ -150,27 +150,34 @@ export class CombinedMCPServer {
             return;
         }
 
-        // Create or get server for this API key
-        if (!this.sseServers[apiKey]) {
-            this.sseServers[apiKey] = new AnyCrawlMCPServer(apiKey, this.config.baseUrl);
-        }
-
-        if (!this.sseTransports[apiKey]) {
-            this.sseTransports[apiKey] = {};
-        }
-
-        // Create SSE transport for this API key
-        // SSEServerTransport returns the path in event: endpoint, use generic /messages endpoint
-        const transport = new SSEServerTransport('/messages', res);
-        this.sseTransports[apiKey][transport.sessionId] = transport;
-
-        res.on("close", () => {
-            if (this.sseTransports[apiKey]) {
-                delete this.sseTransports[apiKey][transport.sessionId];
+        try {
+            // Create or get server for this API key
+            if (!this.sseServers[apiKey]) {
+                this.sseServers[apiKey] = new AnyCrawlMCPServer(apiKey, this.config.baseUrl);
             }
-        });
 
-        await this.sseServers[apiKey].connectTransport(transport);
+            if (!this.sseTransports[apiKey]) {
+                this.sseTransports[apiKey] = {};
+            }
+
+            // Create SSE transport for this API key
+            // SSEServerTransport returns the path in event: endpoint, use generic /messages endpoint
+            const transport = new SSEServerTransport('/messages', res);
+            this.sseTransports[apiKey][transport.sessionId] = transport;
+
+            res.on("close", () => {
+                if (this.sseTransports[apiKey]) {
+                    delete this.sseTransports[apiKey][transport.sessionId];
+                }
+            });
+
+            await this.sseServers[apiKey].connectTransport(transport);
+        } catch (error) {
+            logger.error(`Failed to create SSE connection for API key ${apiKey}:`, error);
+            if (!res.headersSent) {
+                res.status(500).send('Internal server error');
+            }
+        }
     }
 
     private async handleSseMessages(req: Request, res: Response): Promise<void> {
