@@ -60,6 +60,9 @@ export class CombinedMCPServer {
         // SSE endpoints with API key routing
         this.app.get('/:apiKey/sse', this.handleSseGet.bind(this));
         this.app.post('/:apiKey/messages', this.handleSseMessages.bind(this));
+
+        // Generic messages endpoint for SSE clients (without API key in path)
+        this.app.post('/messages', this.handleGenericSseMessages.bind(this));
     }
 
     private async handleMcpPost(req: Request, res: Response): Promise<void> {
@@ -157,7 +160,8 @@ export class CombinedMCPServer {
         }
 
         // Create SSE transport for this API key
-        const transport = new SSEServerTransport(`/${apiKey}/messages`, res);
+        // SSEServerTransport returns the path in event: endpoint, use generic /messages endpoint
+        const transport = new SSEServerTransport('/messages', res);
         this.sseTransports[apiKey][transport.sessionId] = transport;
 
         res.on("close", () => {
@@ -185,12 +189,40 @@ export class CombinedMCPServer {
         }
     }
 
+    private async handleGenericSseMessages(req: Request, res: Response): Promise<void> {
+        const sessionId = req.query.sessionId as string;
+        if (!sessionId) {
+            res.status(400).send('sessionId is required');
+            return;
+        }
+
+        // Find the transport across all API keys
+        let transport: SSEServerTransport | undefined;
+        let foundApiKey: string | undefined;
+
+        for (const apiKey in this.sseTransports) {
+            if (this.sseTransports[apiKey] && this.sseTransports[apiKey][sessionId]) {
+                transport = this.sseTransports[apiKey][sessionId];
+                foundApiKey = apiKey;
+                break;
+            }
+        }
+
+        if (transport) {
+            await transport.handlePostMessage(req, res, req.body);
+        } else {
+            res.status(400).send('No transport found for sessionId');
+        }
+    }
+
+
     public async start(): Promise<void> {
         return new Promise<void>((resolve) => {
             this.app.listen(this.config.port, this.config.host, () => {
                 logger.info(`MCP Combined Server listening on http://${this.config.host}:${this.config.port}`);
                 logger.info(`MCP endpoints: http://${this.config.host}:${this.config.port}/{API_KEY}/mcp`);
                 logger.info(`SSE endpoints: http://${this.config.host}:${this.config.port}/{API_KEY}/sse`);
+                logger.info(`SSE message endpoints: http://${this.config.host}:${this.config.port}/{API_KEY}/messages`);
                 resolve();
             });
         });
