@@ -193,6 +193,15 @@ export class CombinedMCPServer {
             });
 
             await this.sseServers[apiKey].connectTransport(transport);
+            
+            // Send connection confirmation message (like Firecrawl does)
+            res.write(`event: message\ndata: ${JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'sse/connection',
+                params: {
+                    message: 'SSE Connection established'
+                }
+            })}\n\n`);
         } catch (error) {
             logger.error(`Failed to create SSE connection for API key ${apiKey}:`, error);
             if (!res.headersSent) {
