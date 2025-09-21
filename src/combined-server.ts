@@ -151,6 +151,11 @@ export class CombinedMCPServer {
         }
 
         try {
+            // Disable compression for SSE - this is critical for proper SSE functionality
+            res.setHeader('Cache-Control', 'no-cache, no-transform');
+            res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+            res.setHeader('Connection', 'keep-alive');
+            
             // Create or get server for this API key
             if (!this.sseServers[apiKey]) {
                 this.sseServers[apiKey] = new AnyCrawlMCPServer(apiKey, this.config.baseUrl);
