@@ -222,9 +222,13 @@ export class CombinedMCPServer {
 
         if (transport) {
             logger.info(`Handling message for sessionId: ${sessionId}, apiKey: ${foundApiKey}`);
+            logger.info(`Request body: ${JSON.stringify(req.body)}`);
+            
             // Handle the message through the transport
             await transport.handlePostMessage(req, res, req.body);
+            
             logger.info(`Message handling completed for sessionId: ${sessionId}`);
+            logger.info(`Response status: ${res.statusCode}, headers sent: ${res.headersSent}`);
         } else {
             logger.warn(`No transport found for sessionId: ${sessionId}`);
             res.status(400).send('No transport found for sessionId');
