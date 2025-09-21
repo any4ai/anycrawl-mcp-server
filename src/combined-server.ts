@@ -155,7 +155,7 @@ export class CombinedMCPServer {
             res.setHeader('Cache-Control', 'no-cache, no-transform');
             res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
             res.setHeader('Connection', 'keep-alive');
-            
+
             // Create or get server for this API key
             if (!this.sseServers[apiKey]) {
                 this.sseServers[apiKey] = new AnyCrawlMCPServer(apiKey, this.config.baseUrl);
@@ -221,8 +221,12 @@ export class CombinedMCPServer {
         }
 
         if (transport) {
+            logger.info(`Handling message for sessionId: ${sessionId}, apiKey: ${foundApiKey}`);
+            // Handle the message through the transport
             await transport.handlePostMessage(req, res, req.body);
+            logger.info(`Message handling completed for sessionId: ${sessionId}`);
         } else {
+            logger.warn(`No transport found for sessionId: ${sessionId}`);
             res.status(400).send('No transport found for sessionId');
         }
     }
