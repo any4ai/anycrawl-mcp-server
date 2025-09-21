@@ -176,6 +176,22 @@ export class CombinedMCPServer {
                 }
             });
 
+            // Add heartbeat to keep connection alive
+            const heartbeat = setInterval(() => {
+                if (!res.destroyed) {
+                    res.write(': heartbeat\n\n');
+                } else {
+                    clearInterval(heartbeat);
+                }
+            }, 30000); // Send heartbeat every 30 seconds
+
+            res.on("close", () => {
+                clearInterval(heartbeat);
+                if (this.sseTransports[apiKey]) {
+                    delete this.sseTransports[apiKey][transport.sessionId];
+                }
+            });
+
             await this.sseServers[apiKey].connectTransport(transport);
         } catch (error) {
             logger.error(`Failed to create SSE connection for API key ${apiKey}:`, error);
@@ -223,10 +239,10 @@ export class CombinedMCPServer {
         if (transport) {
             logger.info(`Handling message for sessionId: ${sessionId}, apiKey: ${foundApiKey}`);
             logger.info(`Request body: ${JSON.stringify(req.body)}`);
-            
+
             // Handle the message through the transport
             await transport.handlePostMessage(req, res, req.body);
-            
+
             logger.info(`Message handling completed for sessionId: ${sessionId}`);
             logger.info(`Response status: ${res.statusCode}, headers sent: ${res.headersSent}`);
         } else {
