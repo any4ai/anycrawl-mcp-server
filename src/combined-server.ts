@@ -155,6 +155,8 @@ export class CombinedMCPServer {
             res.setHeader('Cache-Control', 'no-cache, no-transform');
             res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
             res.setHeader('Connection', 'keep-alive');
+            res.setHeader('Content-Encoding', 'identity'); // Disable gzip compression
+            res.setHeader('Vary', 'Accept-Encoding'); // Prevent compression
 
             // Create or get server for this API key
             if (!this.sseServers[apiKey]) {
