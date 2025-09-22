@@ -151,12 +151,15 @@ export class CombinedMCPServer {
         }
 
         try {
-            // Disable compression for SSE - this is critical for proper SSE functionality
+            // Disable compression and buffering for SSE - critical for proper SSE functionality
             res.setHeader('Cache-Control', 'no-cache, no-transform');
             res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+            res.setHeader('X-Caddy-Buffering', 'no'); // Disable caddy buffering
             res.setHeader('Connection', 'keep-alive');
             res.setHeader('Content-Encoding', 'identity'); // Disable gzip compression
             res.setHeader('Vary', 'Accept-Encoding'); // Prevent compression
+            res.setHeader('Transfer-Encoding', 'chunked'); // Enable chunked transfer
+            res.setHeader('X-Content-Type-Options', 'nosniff'); // Prevent content type sniffing
 
             // Create or get server for this API key
             if (!this.sseServers[apiKey]) {
