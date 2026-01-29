@@ -31,16 +31,35 @@ ANYCRAWL_API_KEY=YOUR-API-KEY anycrawl-mcp
 
 ## Configuration
 
-Set the required environment variable:
+AnyCrawl MCP Server supports two deployment modes: **Cloud Service** (recommended) and **Self-Hosted**.
+
+### Cloud Service (Recommended)
+
+Use the AnyCrawl cloud service at `mcp.anycrawl.dev`. No server setup required.
 
 ```bash
+# Only need your API key
 export ANYCRAWL_API_KEY="your-api-key-here"
 ```
 
-Optionally set a custom base URL:
+Cloud endpoints:
+- **MCP (streamable_http)**: `https://mcp.anycrawl.dev/{API_KEY}/mcp`
+- **SSE**: `https://mcp.anycrawl.dev/{API_KEY}/sse`
+
+### Self-Hosted Deployment
+
+For self-hosted deployments, configure the base URL to point to your own AnyCrawl API instance:
 
 ```bash
-export ANYCRAWL_BASE_URL="https://api.anycrawl.dev"  # Default
+export ANYCRAWL_API_KEY="your-api-key-here"
+export ANYCRAWL_BASE_URL="https://your-api-server.com"  # Your self-hosted API URL
+```
+
+For local development with custom host/port:
+
+```bash
+export ANYCRAWL_HOST="127.0.0.1"  # Default: mcp.anycrawl.dev (cloud)
+export ANYCRAWL_PORT="3000"       # Default: 3000
 ```
 
 ### Get your API key
@@ -206,6 +225,37 @@ Add this to `./codeium/windsurf/model_config.json`:
 }
 ```
 
+### Running on Claude Desktop / Claude Code
+
+#### Claude Code (CLI)
+
+Add AnyCrawl MCP server using the `claude mcp add` command:
+
+```bash
+claude mcp add --transport stdio anycrawl -e ANYCRAWL_API_KEY=your-api-key -- npx -y anycrawl-mcp
+```
+
+#### Claude Desktop
+
+Add this to your Claude Desktop configuration file:
+
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "anycrawl": {
+      "command": "npx",
+      "args": ["-y", "anycrawl-mcp"],
+      "env": {
+        "ANYCRAWL_API_KEY": "YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
 ### Running with SSE Server Mode
 
 The SSE (Server-Sent Events) mode provides a web-based interface for MCP communication, ideal for web applications, testing, and integration with web-based LLM clients.
@@ -222,11 +272,11 @@ ANYCRAWL_API_KEY=YOUR-API-KEY npm run dev:sse
 
 #### Server Configuration
 
-Optional server settings (defaults shown):
+Optional server settings for local/self-hosted deployments:
 
 ```bash
-export ANYCRAWL_PORT=3000
-export ANYCRAWL_HOST=0.0.0.0
+export ANYCRAWL_PORT=3000           # Default: 3000
+export ANYCRAWL_HOST=127.0.0.1      # Set to override cloud default (mcp.anycrawl.dev)
 ```
 
 #### Health Check

@@ -134,10 +134,12 @@ async function main() {
         if (mode === 'MCP') {
             // MCP(JSON) mode for Cursor streamable_http
             const port = Number(process.env.ANYCRAWL_PORT || process.env.ANYCRAWL_MCP_PORT || 3000);
-            const host = process.env.ANYCRAWL_HOST || '0.0.0.0';
+            const host = process.env.ANYCRAWL_HOST || 'mcp.anycrawl.dev';
+            const isLocalHost = process.env.ANYCRAWL_HOST !== undefined;
+            const endpointUrl = isLocalHost ? `http://${host}:${port}/mcp` : `https://${host}/mcp`;
 
             logger.info(`Starting AnyCrawl FastMCP Server in MCP(JSON) mode`);
-            logger.info(`   MCP endpoint: http://${host}:${port}/mcp`);
+            logger.info(`   MCP endpoint: ${endpointUrl}`);
 
             await server.start({
                 transportType: 'httpStream',
@@ -152,10 +154,12 @@ async function main() {
         } else if (mode === 'SSE') {
             // SSE mode for web/browser clients
             const port = Number(process.env.ANYCRAWL_PORT || process.env.ANYCRAWL_SSE_PORT || 3000);
-            const host = process.env.ANYCRAWL_HOST || '0.0.0.0';
+            const host = process.env.ANYCRAWL_HOST || 'mcp.anycrawl.dev';
+            const isLocalHost = process.env.ANYCRAWL_HOST !== undefined;
+            const endpointUrl = isLocalHost ? `http://${host}:${port}/sse` : `https://${host}/sse`;
 
             logger.info(`Starting AnyCrawl FastMCP Server in SSE mode`);
-            logger.info(`   SSE endpoint: http://${host}:${port}/sse`);
+            logger.info(`   SSE endpoint: ${endpointUrl}`);
 
             await server.start({
                 transportType: 'httpStream',
