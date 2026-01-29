@@ -43,6 +43,7 @@ export ANYCRAWL_API_KEY="your-api-key-here"
 ```
 
 Cloud endpoints:
+
 - **MCP (streamable_http)**: `https://mcp.anycrawl.dev/{API_KEY}/mcp`
 - **SSE**: `https://mcp.anycrawl.dev/{API_KEY}/sse`
 
@@ -209,7 +210,7 @@ Optionally, place the following in `.vscode/mcp.json` in your workspace to share
 
 ### Running on Windsurf
 
-Add this to `./codeium/windsurf/model_config.json`:
+Add this to `~/.codeium/windsurf/model_config.json`:
 
 ```json
 {
@@ -263,8 +264,7 @@ The SSE (Server-Sent Events) mode provides a web-based interface for MCP communi
 #### Quick Start
 
 ```bash
-# Development mode
-ANYCRAWL_API_KEY=YOUR-API-KEY npx -y anycrawl-mcp
+ANYCRAWL_MODE=SSE ANYCRAWL_API_KEY=YOUR-API-KEY npx -y anycrawl-mcp
 
 # Or using npm scripts
 ANYCRAWL_API_KEY=YOUR-API-KEY npm run dev:sse
