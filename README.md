@@ -7,7 +7,7 @@
 - **Web Scraping**: Extract content from single URLs with multiple output formats
 - **Website Crawling**: Crawl entire websites with configurable depth and limits
 - **Search Engine Integration**: Search the web and optionally scrape results
-- **Multiple Engines**: Support for Playwright, Cheerio, and Puppeteer
+- **Multiple Engines**: Auto mode (intelligent selection), Playwright, Cheerio, and Puppeteer
 - **Flexible Output**: Markdown, HTML, text, screenshots, and structured JSON
 - **Async Operations**: Non-blocking crawl jobs with status monitoring
 - **Error Handling**: Robust error handling and logging
@@ -370,7 +370,7 @@ Scrape a single URL and extract content in various formats.
 **Parameters:**
 
 - `url` (required): The URL to scrape
-- `engine` (required): Scraping engine (`playwright`, `cheerio`, `puppeteer`)
+- `engine` (optional): Scraping engine (`auto`, `playwright`, `cheerio`, `puppeteer`; default: `auto`)
 - `formats` (optional): Output formats (`markdown`, `html`, `text`, `screenshot`, `screenshot@fullPage`, `rawHtml`, `json`)
 - `proxy` (optional): Proxy URL
 - `timeout` (optional): Timeout in milliseconds (default: 300000)
@@ -387,7 +387,6 @@ Scrape a single URL and extract content in various formats.
   "name": "anycrawl_scrape",
   "arguments": {
     "url": "https://example.com",
-    "engine": "cheerio",
     "formats": ["markdown", "html"],
     "timeout": 30000
   }
@@ -407,7 +406,7 @@ Start a crawl job to scrape multiple pages from a website. By default this waits
 **Parameters:**
 
 - `url` (required): The base URL to crawl
-- `engine` (required): Scraping engine
+- `engine` (optional): Scraping engine (`auto`, `playwright`, `cheerio`, `puppeteer`; default: `auto`)
 - `max_depth` (optional): Maximum crawl depth (default: 10)
 - `limit` (optional): Maximum number of pages (default: 100)
 - `strategy` (optional): Crawling strategy (`all`, `same-domain`, `same-hostname`, `same-origin`)
@@ -424,7 +423,6 @@ Start a crawl job to scrape multiple pages from a website. By default this waits
   "name": "anycrawl_crawl",
   "arguments": {
     "url": "https://example.com/blog",
-    "engine": "playwright",
     "max_depth": 2,
     "limit": 50,
     "strategy": "same-domain",
@@ -527,7 +525,6 @@ Search the web using AnyCrawl search engine.
     "engine": "google",
     "limit": 5,
     "scrape_options": {
-      "engine": "cheerio",
       "formats": ["markdown"]
     }
   }
@@ -565,6 +562,12 @@ Unprocessed HTML content.
 Structured data extraction using custom schemas.
 
 ## Engines
+
+### Auto (Default)
+
+- Automatically selects the best engine for the target URL
+- Optimizes for speed and accuracy without manual configuration
+- Recommended for most use cases
 
 ### Cheerio
 

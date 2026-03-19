@@ -48,11 +48,11 @@ export class AnyCrawlMCPServer {
 Best for: One known page (articles, docs, product pages).
 Not recommended for: Multi-page coverage (use anycrawl_crawl) or open-ended discovery (use anycrawl_search).
 
-RECOMMENDED: Use 'playwright' engine for best results with dynamic content and modern websites.
+RECOMMENDED: Use 'auto' engine (default) to let the server automatically choose the best engine for the target URL.
 
 Usage (parameters):
 - url: HTTP/HTTPS URL to scrape (string, required)
-- engine: 'playwright' | 'cheerio' | 'puppeteer' (required, default: 'playwright')
+- engine: 'auto' | 'playwright' | 'cheerio' | 'puppeteer' (optional, default: 'auto')
 - proxy: Proxy URL (string, optional)
 - formats: Output formats ['markdown'|'html'|'text'|'screenshot'|'screenshot@fullPage'|'rawHtml'|'json'] (optional)
 - timeout: Request timeout in ms (number, optional)
@@ -66,9 +66,10 @@ Usage (parameters):
 Returns: { url, status, jobId?, title?, html?, markdown?, metadata?, timestamp? }
 
 Examples:
-- Recommended: { "url": "https://example.com", "engine": "playwright" }
-- With JSON extraction: { "url": "https://news.ycombinator.com", "engine": "playwright", "formats": ["markdown"], "json_options": { "user_prompt": "Extract titles", "schema_name": "Articles" } }
-- With JSON schema extraction: { "url": "https://example.com/article", "engine": "playwright", "json_options": { "schema_name": "Article", "schema_description": "Extract article metadata and content", "schema": { "type": "object", "properties": { "title": { "type": "string" }, "author": { "type": "string" }, "date": { "type": "string" }, "content": { "type": "string" } }, "required": ["title", "content"] } } }`,
+- Recommended: { "url": "https://example.com" }
+- With specific engine: { "url": "https://example.com", "engine": "playwright" }
+- With JSON extraction: { "url": "https://news.ycombinator.com", "formats": ["markdown"], "json_options": { "user_prompt": "Extract titles", "schema_name": "Articles" } }
+- With JSON schema extraction: { "url": "https://example.com/article", "json_options": { "schema_name": "Article", "schema_description": "Extract article metadata and content", "schema": { "type": "object", "properties": { "title": { "type": "string" }, "author": { "type": "string" }, "date": { "type": "string" }, "content": { "type": "string" } }, "required": ["title", "content"] } } }`,
                 inputSchema: ScrapeToolSchema
             },
             {
@@ -78,11 +79,11 @@ Examples:
 Best for: Multi-page coverage, site mapping, content discovery.
 Not recommended for: Single pages (use anycrawl_scrape) or open-ended discovery (use anycrawl_search).
 
-RECOMMENDED: Use 'playwright' engine for best results with dynamic content and modern websites.
+RECOMMENDED: Use 'auto' engine (default) to let the server automatically choose the best engine for each page.
 
 Usage (parameters):
 - url: Starting URL to crawl (string, required)
-- engine: 'playwright' | 'cheerio' | 'puppeteer' (required, default: 'playwright')
+- engine: 'auto' | 'playwright' | 'cheerio' | 'puppeteer' (optional, default: 'auto')
 - max_depth: Maximum crawl depth (number, optional, default: 10)
 - limit: Maximum pages to crawl (number, optional, default: 100)
 - strategy: Crawl strategy 'all' | 'same-domain' | 'same-hostname' | 'same-origin' (optional, default: 'same-domain')
@@ -97,9 +98,10 @@ Usage (parameters):
 Returns: { job_id, status, message } for async jobs
 
 Examples:
-- Recommended: { "url": "https://example.com", "engine": "playwright", "limit": 50 }
-- Deep crawl: { "url": "https://docs.example.com", "engine": "playwright", "max_depth": 5, "limit": 200 }
-- Filtered crawl: { "url": "https://blog.example.com", "engine": "playwright", "include_paths": ["/posts/*"], "exclude_paths": ["/admin/*"] }`,
+- Recommended: { "url": "https://example.com", "limit": 50 }
+- With specific engine: { "url": "https://example.com", "engine": "playwright", "limit": 50 }
+- Deep crawl: { "url": "https://docs.example.com", "max_depth": 5, "limit": 200 }
+- Filtered crawl: { "url": "https://blog.example.com", "include_paths": ["/posts/*"], "exclude_paths": ["/admin/*"] }`,
                 inputSchema: CrawlToolSchema
             },
             {
@@ -109,7 +111,7 @@ Examples:
 Best for: Open-ended discovery, finding relevant content.
 Not recommended for: Known URLs (use anycrawl_scrape) or comprehensive site coverage (use anycrawl_crawl).
 
-RECOMMENDED: Use limit=5 for balanced performance and cost. Use 'playwright' engine for scraping results.
+RECOMMENDED: Use limit=5 for balanced performance and cost. Use 'auto' engine (default) for scraping results.
 
 Usage (parameters):
 - query: Search query string (string, required)
@@ -126,7 +128,7 @@ Returns: Array of search results with optional scraped content
 
 Examples:
 - Recommended: { "query": "artificial intelligence news", "limit": 5 }
-- With scraping: { "query": "TypeScript tutorials", "limit": 5, "scrape_options": { "formats": ["markdown"], "engine": "playwright" } }
+- With scraping: { "query": "TypeScript tutorials", "limit": 5, "scrape_options": { "formats": ["markdown"] } }
 - Localized search: { "query": "machine learning", "lang": "es", "country": "ES", "limit": 5 }`,
                 inputSchema: SearchToolSchema
             },

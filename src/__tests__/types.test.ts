@@ -16,6 +16,7 @@ import {
 
 describe('types schemas', () => {
     test('EngineSchema allows supported engines', () => {
+        expect(EngineSchema.parse('auto')).toBe('auto');
         expect(EngineSchema.parse('cheerio')).toBe('cheerio');
         expect(EngineSchema.parse('playwright')).toBe('playwright');
         expect(EngineSchema.parse('puppeteer')).toBe('puppeteer');
@@ -59,7 +60,7 @@ describe('types schemas', () => {
 
     test('ScrapeToolSchema fills defaults and accepts missing engine', () => {
         const v = ScrapeToolSchema.parse({ url: 'https://a.com' } as any);
-        expect(v.engine).toBe('playwright');
+        expect(v.engine).toBe('auto');
         expect(v.retry).toBe(false);
     });
 

@@ -1,5 +1,5 @@
 {
-  "name": "anycrawl-mcp-server",
+  "name": "anycrawl-mcp",
   "version": "1.0.3",
   "description": "AnyCrawl MCP Server - Adds powerful web scraping and crawling to Cursor, Claude and any other LLM clients",
   "main": "dist/index.js",

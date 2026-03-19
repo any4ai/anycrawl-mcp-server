@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Engine types
-export const EngineSchema = z.enum(['playwright', 'cheerio', 'puppeteer']);
+export const EngineSchema = z.enum(['auto', 'playwright', 'cheerio', 'puppeteer']);
 export type Engine = z.infer<typeof EngineSchema>;
 
 // Format types
@@ -111,14 +111,14 @@ export interface SearchResult {
 // MCP Tool schemas
 export const ScrapeToolSchema = ScrapeOptionsSchema.extend({
   url: z.string().url(),
-  engine: EngineSchema.default('playwright'),
+  engine: EngineSchema.default('auto'),
   retry: z.boolean().default(false),
   proxy: z.string().url().optional(),
 });
 
 export const CrawlToolSchema = ScrapeOptionsBaseSchema.extend({
   url: z.string().url(),
-  engine: EngineSchema.default('playwright'),
+  engine: EngineSchema.default('auto'),
   retry: z.boolean().default(false),
   exclude_paths: z.array(z.string()).optional(),
   include_paths: z.array(z.string()).optional(),
