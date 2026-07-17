@@ -44,8 +44,8 @@ export ANYCRAWL_API_KEY="your-api-key-here"
 
 Cloud endpoints:
 
-- **MCP (streamable_http)**: `https://mcp.anycrawl.dev/{API_KEY}/mcp`
-- **SSE**: `https://mcp.anycrawl.dev/{API_KEY}/sse`
+- **MCP (streamable_http)**: `https://mcp.anycrawl.dev/{API_KEY}/mcp` — **use this for Codex and Cursor**
+- **SSE**: `https://mcp.anycrawl.dev/{API_KEY}/sse` — legacy SSE clients only (not Codex)
 
 ### Self-Hosted Deployment
 
@@ -354,6 +354,24 @@ Cloud HTTP Streamable Server:
 ```
 
 Note: For HTTP modes, set `ANYCRAWL_API_KEY` (and optional host/port) in the server process environment or in the URL. Cursor does not need your API key when using `streamable_http`.
+
+### Codex configuration (streamable HTTP)
+
+Codex uses **streamable HTTP** only. It does **not** support the legacy SSE transport.
+
+Add this to `~/.codex/config.toml` (replace `YOUR_API_KEY`):
+
+```toml
+[mcp_servers.anycrawl]
+url = "https://mcp.anycrawl.dev/YOUR_API_KEY/mcp"
+startup_timeout_sec = 60
+```
+
+Important:
+
+- Use `/mcp`, **not** `/sse`. Configuring `/sse` causes Codex to hang until timeout (~30s) because it expects streamable HTTP, not SSE.
+- Put your API key in the URL path (Codex does not read `ANYCRAWL_API_KEY` for remote servers).
+- If startup still times out, increase `startup_timeout_sec` (default is 10 seconds in Codex).
 
 ## Available Tools
 
