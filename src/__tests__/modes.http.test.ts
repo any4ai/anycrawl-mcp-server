@@ -30,7 +30,10 @@ describe('Server modes', () => {
         app.use(cors({ origin: '*', exposedHeaders: ['Mcp-Session-Id'], allowedHeaders: ['Content-Type', 'mcp-session-id'] }));
 
         const srv = new AnyCrawlMCPServer('test');
-        const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
+        const transport: StreamableHTTPServerTransport = new StreamableHTTPServerTransport({
+            sessionIdGenerator: () => 'test-session',
+            enableJsonResponse: true,
+        });
         // Inline minimal bridge (avoid depending on server.connectTransport)
         (transport as any).onmessage = async (message: any) => {
             const id = message?.id;
@@ -80,6 +83,8 @@ describe('Server modes', () => {
                 }),
             });
             expect(initResp.status).toBe(200);
+            const sessionId = initResp.headers.get('mcp-session-id');
+            expect(sessionId).toBe('test-session');
             const json = await initResp.json();
             expect(json.result).toBeTruthy();
 
@@ -90,6 +95,7 @@ describe('Server modes', () => {
                     Accept: 'application/json, text/event-stream',
                     'Content-Type': 'application/json',
                     'Mcp-Protocol-Version': '2025-03-26',
+                    'Mcp-Session-Id': sessionId!,
                 } as any,
                 body: JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'anycrawl_scrape', arguments: { url: 'bad-url' } } }),
             });

@@ -41,7 +41,7 @@
   "license": "MIT",
   "dependencies": {
     "@anycrawl/js-sdk": "0.0.3",
-    "fastmcp": "^3.17.0",
+    "fastmcp": "^4.7.1",
     "zod": "^3.22.0"
   },
   "devDependencies": {
