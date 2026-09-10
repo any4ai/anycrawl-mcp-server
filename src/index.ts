@@ -57,7 +57,8 @@ const server = new FastMCP<SessionData>({
             const apiKey = extractApiKey(request.headers);
 
             if (!apiKey) {
-                throw new Error('AnyCrawl API key is required');
+                // FastMCP forwards Response errors for both HTTP and legacy SSE.
+                throw new Response('AnyCrawl API key is required', { status: 401 });
             }
             return { anycrawlApiKey: apiKey };
         } else {

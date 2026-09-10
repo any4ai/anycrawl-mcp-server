@@ -16,7 +16,10 @@
     "start:sse": "ANYCRAWL_MODE=SSE node dist/cli.js",
     "dev:mcp": "ANYCRAWL_MODE=MCP tsx src/cli.ts",
     "dev:sse": "ANYCRAWL_MODE=SSE tsx src/cli.ts",
-    "test": "jest",
+    "test": "npm run test:unit && npm run test:handshake",
+    "test:unit": "jest --runInBand",
+    "test:handshake": "npm run build && node --test tests/roots.test.mjs tests/handshake.test.mjs",
+    "test:containers": "node scripts/test-containers.mjs",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts",
     "prepublishOnly": "npm run build"
@@ -41,7 +44,7 @@
   "license": "MIT",
   "dependencies": {
     "@anycrawl/js-sdk": "0.0.3",
-    "fastmcp": "^4.7.1",
+    "fastmcp": "4.7.1",
     "zod": "^3.22.0"
   },
   "devDependencies": {
@@ -63,7 +66,7 @@
     "typescript": "^5.0.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.12.0"
   },
   "overrides": {
     "undici": "^5.29.0"

@@ -632,7 +632,7 @@ export LOG_LEVEL=debug  # debug, info, warn, error
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22.12+ (Node 22 is used by Docker and CI; see `.node-version`)
 - npm
 
 ### Setup
@@ -654,6 +654,21 @@ npm run build
 ```bash
 npm test
 ```
+
+This runs the existing unit tests, builds the CLI, and checks real FastMCP
+handshakes over STDIO, Streamable HTTP, and legacy SSE. The roots regression
+advertises client roots support while leaving `roots/list` unanswered: roots
+disabled must produce zero requests and a ready session within two seconds.
+
+To verify both Docker images, including the Nginx routes:
+
+```bash
+docker build -t anycrawl-mcp:verify .
+docker build -f Dockerfile.service -t anycrawl-mcp-combined:verify .
+npm run test:containers -- anycrawl-mcp:verify anycrawl-mcp-combined:verify
+```
+
+Release and rollback checks are documented in [the MCP deployment runbook](docs/mcp-release.md).
 
 ### Lint
 
