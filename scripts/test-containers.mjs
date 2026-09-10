@@ -5,6 +5,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { checkHandshake, checkUnauthorized, waitForHealth, TEST_KEY } from '../tests/helpers.mjs';
+import { checkSsePostReuse } from '../tests/sse-reuse.mjs';
 
 const [standardImage, combinedImage] = process.argv.slice(2);
 assert.ok(
@@ -89,6 +90,13 @@ try {
     'Nginx SSE',
     await checkHandshake(new SSEClientTransport(new URL(`${base}/${TEST_KEY}/sse`)))
   );
+
+  for (const [route, headers] of [
+    [`/${TEST_KEY}/sse`, {}],
+    ['/sse', { 'x-anycrawl-api-key': TEST_KEY }],
+  ]) {
+    console.log('Nginx SSE POST reuse', await checkSsePostReuse(`${base}${route}`, headers));
+  }
 
   const wrongEndpoint = await fetch(`${base}/${TEST_KEY}/sse`, {
     headers: { Accept: 'application/json, text/event-stream' },
